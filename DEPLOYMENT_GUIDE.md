@@ -34,17 +34,30 @@ git status
 
 The BuildConfig is configured for **manual trigger** (no automatic builds on Git push).
 
-Update [Deployment/openshift/01-buildconfig.yaml](Deployment/openshift/01-buildconfig.yaml) with your repository:
+The BuildConfig is pre-configured with your repository:
 
 ```yaml
 source:
   type: Git
   git:
-    uri: https://github.com/YOUR-ORG/YOUR-REPO.git # <- Update this
-    ref: main # <- Update if different branch
+    uri: https://github.com/mohanramphp/MyContainerApp.git
+    ref: main
 ```
 
-### Step 3: Create Namespace (Optional)
+If you're using a different repository, update [Deployment/openshift/01-buildconfig.yaml](Deployment/openshift/01-buildconfig.yaml) accordingly.
+
+### Step 3: Configure Namespace
+
+**⚠️ Red Hat Developer Sandbox Limitation**: If using Red Hat Developer Sandbox (free tier), you are limited to **one project** (`mohanramphp-dev`). You cannot create additional namespaces.
+
+**For Sandbox Users**:
+
+```bash
+# Use the pre-created namespace
+oc project mohanramphp-dev
+```
+
+**For Full OpenShift Clusters**:
 
 ```bash
 # Create a dedicated namespace
@@ -54,24 +67,24 @@ oc create namespace pizza-app
 oc project pizza-app
 ```
 
-If deploying to existing namespace:
-
-```bash
-oc project your-existing-namespace
-```
-
 ### Step 4: Apply Configuration
 
 Apply all OpenShift manifests in order:
 
 ```bash
-# Option 1: Apply all at once
+# Option 1: Apply all at once (recommended)
 oc apply -f Deployment/openshift/
 
-# Option 2: Apply individually for better control
+# Option 2: Apply by type for better control
+# First, create build and storage resources
 oc apply -f Deployment/openshift/01-buildconfig.yaml
 oc apply -f Deployment/openshift/02-imagestream.yaml
 oc apply -f Deployment/openshift/06-configmap.yaml
+
+# Then, after build completes, create runtime resources
+oc apply -f Deployment/openshift/03-deploymentconfig.yaml
+oc apply -f Deployment/openshift/04-service.yaml
+oc apply -f Deployment/openshift/05-route.yaml
 ```
 
 **Expected Output:**
@@ -80,6 +93,9 @@ oc apply -f Deployment/openshift/06-configmap.yaml
 imagestreamimport.image.openshift.io/pizza-api created
 buildconfig.build.openshift.io/pizza-api created
 configmap/pizza-api-config created
+deploymentconfig.apps.openshift.io/pizza-api created
+service/pizza-api created
+route.route.openshift.io/pizza-api created
 ```
 
 ### Step 5: Trigger Build
@@ -130,7 +146,7 @@ Check that all components are ready:
 ```bash
 # Check pods are running
 oc get pods -l app=pizza-api
-# Expected: 2 pods in "Running" state with "1/1" ready
+# Expected: 1 pod in "Running" state with "1/1" ready
 
 # Check service
 oc get svc pizza-api
@@ -139,25 +155,41 @@ oc describe svc pizza-api
 
 # Check route
 oc get routes
-# Expected: Route with hostname
+# Expected: Route with hostname and TLS edge termination
 oc describe route pizza-api
 
-# Get the public Route URL
+# Get the public Route URL (HTTPS supported via TLS edge termination)
 ROUTE_URL=$(oc get route pizza-api -o jsonpath='{.spec.host}')
-echo "API URL: http://$ROUTE_URL"
+echo "API URL (HTTP): http://$ROUTE_URL"
+echo "API URL (HTTPS): https://$ROUTE_URL"
 ```
 
 ### Step 8: Test the API
 
 ```bash
-# Health check
+# Health check (HTTP)
 curl http://$ROUTE_URL/health
 
-# Get all pizzas (should be empty)
-curl http://$ROUTE_URL/api/pizzas
+# Health check (HTTPS - recommended)
+curl https://$ROUTE_URL/health
+
+# Verify ConfigMap environment variables are being read correctly
+curl https://$ROUTE_URL/api/pizzas/config/environment
+# Expected Response:
+# {
+#   "logLevel": "From ConfigMap: Information",
+#   "apiName": "From ConfigMap: Pizza API",
+#   "apiVersion": "From ConfigMap: 1.0.0",
+#   "apiEnvironment": "From ConfigMap: Production",
+#   "aspNetCoreEnvironment": "Production",
+#   "aspNetCoreUrls": "http://+:8080"
+# }
+
+# Get all pizzas (should be empty initially)
+curl https://$ROUTE_URL/api/pizzas
 
 # Create a pizza
-curl -X POST http://$ROUTE_URL/api/pizzas \
+curl -X POST https://$ROUTE_URL/api/pizzas \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Pepperoni",
@@ -166,7 +198,7 @@ curl -X POST http://$ROUTE_URL/api/pizzas \
   }'
 
 # Get all pizzas
-curl http://$ROUTE_URL/api/pizzas
+curl https://$ROUTE_URL/api/pizzas
 ```
 
 ### Step 9: View Logs
@@ -305,16 +337,20 @@ oc run -it test --image=curlimages/curl --restart=Never -- curl http://$POD_IP:8
 # Verify route exists and is configured
 oc get routes
 
+# Get actual route hostname
+ROUTE_URL=$(oc get route pizza-api -o jsonpath='{.spec.host}')
+echo $ROUTE_URL
+
 # Test internal service access from pod
 oc run -it test --image=alpine --restart=Never -- \
-  wget -O- http://pizza-api:80/api/pizzas
+  wget -O- http://pizza-api:8080/api/pizzas
 
 # Check DNS resolution
 oc run -it test --image=alpine --restart=Never -- nslookup pizza-api
 
-# Test from route using debug pod
+# Test from route using debug pod (replace with your actual domain)
 oc run -it debug --image=curlimages/curl --restart=Never -- \
-  curl http://pizza-api-default.apps.openshift.com/health
+  curl https://$ROUTE_URL/health
 ```
 
 **Solution**:
