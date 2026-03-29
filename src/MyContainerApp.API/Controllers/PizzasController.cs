@@ -160,10 +160,10 @@ public class PizzasController : ControllerBase
         var envVars = new
         {
             // Environment variables from ConfigMap
-            LogLevel = Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Not set",
-            ApiName = Environment.GetEnvironmentVariable("API_NAME") ?? "Not set",
-            ApiVersion = Environment.GetEnvironmentVariable("API_VERSION") ?? "Not set",
-            ApiEnvironment = Environment.GetEnvironmentVariable("API_ENVIRONMENT") ?? "Not set",
+            LogLevel = $"From ConfigMap: {Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Not set"}",
+            ApiName = $"From ConfigMap: {Environment.GetEnvironmentVariable("API_NAME") ?? "Not set"}",
+            ApiVersion = $"From ConfigMap: {Environment.GetEnvironmentVariable("API_VERSION") ?? "Not set"}",
+            ApiEnvironment = $"From ConfigMap: {Environment.GetEnvironmentVariable("API_ENVIRONMENT") ?? "Not set"}",
             
             // ASP.NET Core environment variables
             AspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Not set",
