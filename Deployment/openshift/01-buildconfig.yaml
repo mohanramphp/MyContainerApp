@@ -2,7 +2,7 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: pizza-api
-  namespace: default
+  namespace: mohanramphp-dev
   labels:
     app: pizza-api
     version: v1
