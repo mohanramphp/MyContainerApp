@@ -52,12 +52,30 @@ spec:
               value: "Production"
             - name: ASPNETCORE_URLS
               value: "http://+:8080"
-            # Additional ConfigMap-based environment variables (optional)
+            # ConfigMap-based environment variables
             - name: LOG_LEVEL
               valueFrom:
                 configMapKeyRef:
                   name: pizza-api-config
                   key: log-level
+                  optional: true
+            - name: API_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: pizza-api-config
+                  key: api-name
+                  optional: true
+            - name: API_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: pizza-api-config
+                  key: api-version
+                  optional: true
+            - name: API_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: pizza-api-config
+                  key: api-environment
                   optional: true
 
           # Health checks
