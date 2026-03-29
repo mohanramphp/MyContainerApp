@@ -145,4 +145,38 @@ public class PizzasController : ControllerBase
             return BadRequest(new { error = ex.Message });
         }
     }
+
+    /// <summary>
+    /// Retrieves all environment variables for verification (from ConfigMap and environment).
+    /// This endpoint verifies that the application is reading configuration from the ConfigMap
+    /// and environment variables, not just appsettings.json
+    /// </summary>
+    [HttpGet("config/environment")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult<object> GetEnvironmentVariables()
+    {
+        _logger.LogInformation("Retrieving environment variables configuration");
+
+        var envVars = new
+        {
+            // Environment variables from ConfigMap
+            LogLevel = Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Not set",
+            ApiName = Environment.GetEnvironmentVariable("API_NAME") ?? "Not set",
+            ApiVersion = Environment.GetEnvironmentVariable("API_VERSION") ?? "Not set",
+            ApiEnvironment = Environment.GetEnvironmentVariable("API_ENVIRONMENT") ?? "Not set",
+            
+            // ASP.NET Core environment variables
+            AspNetCoreEnvironment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Not set",
+            AspNetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? "Not set",
+            
+            // Timestamp
+            RetrievedAt = DateTime.UtcNow,
+            
+            // Source note
+            Source = "These values are read from environment variables (ConfigMap injection), NOT from appsettings.json"
+        };
+
+        return Ok(envVars);
+    }
 }
+
