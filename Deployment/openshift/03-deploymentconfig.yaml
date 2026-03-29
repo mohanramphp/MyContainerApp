@@ -1,0 +1,121 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: pizza-api
+  namespace: default
+  labels:
+    app: pizza-api
+    version: v1
+spec:
+  # Number of replicas
+  replicas: 2
+
+  # Deployment strategy
+  strategy:
+    type: Rolling
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+
+  # Pod template selector
+  selector:
+    app: pizza-api
+    deploymentconfig: pizza-api
+
+  # Pod template specification
+  template:
+    metadata:
+      labels:
+        app: pizza-api
+        deploymentconfig: pizza-api
+      annotations:
+        deployment.kubernetes.io/revision: "1"
+    spec:
+      # Containers specification
+      containers:
+        - name: pizza-api
+          image: pizza-api:latest
+          imagePullPolicy: Always
+
+          # Port configuration
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          # Environment variables
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+            # Additional ConfigMap-based environment variables (optional)
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: pizza-api-config
+                  key: log-level
+                  optional: true
+
+          # Health checks
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+            successThreshold: 1
+
+          # Resource requests and limits
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          # Volume mounts
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+
+      # Volumes
+      volumes:
+        - name: logs
+          emptyDir: {}
+
+      # Pod restart policy
+      restartPolicy: Always
+
+      # Termination grace period
+      terminationGracePeriodSeconds: 30
+
+  # Triggers for automatic redeployment
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - pizza-api
+        from:
+          kind: ImageStreamTag
+          name: pizza-api:latest

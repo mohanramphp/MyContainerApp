@@ -1,0 +1,42 @@
+# Build results
+bin/
+obj/
+out/
+
+# IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.iml
+*.swp
+*.swo
+*~
+
+# NuGet
+packages/
+*.nupkg
+.nuget/
+
+# Build logs
+*.log
+
+# Local environment
+.env
+.env.local
+appsettings.Development.json
+appsettings.Production.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local testing
+logs/
+*.http.log
+
+# Docker
+docker-compose.override.yml
+
+# Git
+.gitkeep

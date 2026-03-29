@@ -1,0 +1,26 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pizza-api
+  namespace: default
+  labels:
+    app: pizza-api
+    version: v1
+spec:
+  # Service to route to
+  to:
+    kind: Service
+    name: pizza-api
+    weight: 100
+
+  # Port specification
+  port:
+    targetPort: http
+
+  # TLS configuration (optional - comment out if no TLS needed)
+  # tls:
+  #   termination: edge
+  #   insecureEdgeTerminationPolicy: Redirect
+
+  # Wildcard policy for subdomain handling
+  wildcardPolicy: None

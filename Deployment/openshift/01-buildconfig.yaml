@@ -1,0 +1,54 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: pizza-api
+  namespace: default
+  labels:
+    app: pizza-api
+    version: v1
+spec:
+  # Output configuration - where the built image is pushed
+  output:
+    to:
+      kind: ImageStreamTag
+      name: pizza-api:latest
+
+  # Source configuration - where to build from
+  source:
+    type: Git
+    git:
+      uri: https://github.com/your-org/your-repo.git # Replace with your repository
+      ref: main
+
+  # Build strategy - Docker build
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+      noCache: false
+
+  # Trigger configuration - set to manual trigger (no auto-trigger)
+  triggers:
+    # Configuration change trigger
+    - type: ConfigChange
+    # Image change trigger (optional - uncomment if you want to rebuild on base image changes)
+    # - type: ImageChange
+    #   imageChange:
+    #     from:
+    #       kind: ImageStreamTag
+    #       name: dotnet:8.0
+
+  # Completion deadline
+  completionDeadlineSeconds: 1800
+
+  # Resource limits for build pods
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Run policy
+  runPolicy: Serial

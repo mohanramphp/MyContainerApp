@@ -1,0 +1,46 @@
+# Build artifacts
+bin/
+obj/
+
+# IDE
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Source control
+.svn/
+
+# Logs
+logs/
+*.log
+
+# NuGet
+packages/
+.nuget/
+
+# Test
+TestResults/
+.coverage/
+
+# Local environment files
+.env
+.env.local
+
+# Docker
+docker-compose.override.yml
+
+# Solution user options
+*.suo
+*.user
+*.sln.docstates

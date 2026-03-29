@@ -1,0 +1,228 @@
+### Pizza API REST Client Tests
+### Base URL and Variables
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### ============================================
+### HEALTH CHECK ENDPOINTS
+### ============================================
+
+### Health Check
+GET {{baseUrl}}/health
+
+### ============================================
+### CREATE PIZZA (POST)
+### ============================================
+
+### Create a new pizza - Margherita
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "Margherita",
+  "price": 12.99,
+  "description": "Classic Italian pizza with fresh tomatoes and mozzarella"
+}
+
+### Create a new pizza - Pepperoni
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "Pepperoni",
+  "price": 14.99,
+  "description": "Delicious pizza with pepperoni slices and melted cheese"
+}
+
+### Create a new pizza - Vegetarian
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "Vegetarian",
+  "price": 11.99,
+  "description": "Fresh vegetables with mozzarella and basil"
+}
+
+### Create a new pizza - BBQ Chicken (for update test)
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "BBQ Chicken",
+  "price": 15.99,
+  "description": "BBQ sauce with grilled chicken and onions"
+}
+
+### ============================================
+### READ PIZZAS (GET)
+### ============================================
+
+### Get all pizzas
+GET {{baseUrl}}/api/pizzas
+
+### Get pizza by ID (ID = 1)
+GET {{baseUrl}}/api/pizzas/1
+
+### Get pizza by ID (ID = 2)
+GET {{baseUrl}}/api/pizzas/2
+
+### Get pizza by ID (ID = 3)
+GET {{baseUrl}}/api/pizzas/3
+
+### Get pizza by ID (ID = 4)
+GET {{baseUrl}}/api/pizzas/4
+
+### Get non-existent pizza (should return 404)
+GET {{baseUrl}}/api/pizzas/999
+
+### ============================================
+### UPDATE PIZZA (PUT)
+### ============================================
+
+### Update pizza with ID 1
+PUT {{baseUrl}}/api/pizzas/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Margherita Deluxe",
+  "price": 13.99,
+  "description": "Premium Margherita with buffalo mozzarella and fresh basil"
+}
+
+### Update pizza with ID 2
+PUT {{baseUrl}}/api/pizzas/2
+Content-Type: {{contentType}}
+
+{
+  "name": "Pepperoni Supreme",
+  "price": 16.99,
+  "description": "Extra pepperoni with double cheese and premium sauce"
+}
+
+### Update pizza with ID 3
+PUT {{baseUrl}}/api/pizzas/3
+Content-Type: {{contentType}}
+
+{
+  "name": "Veggie Delight",
+  "price": 12.99,
+  "description": "Assorted fresh vegetables with ricotta and herbs"
+}
+
+### Update non-existent pizza (should return 404)
+PUT {{baseUrl}}/api/pizzas/999
+Content-Type: {{contentType}}
+
+{
+  "name": "Ghost Pizza",
+  "price": 10.00,
+  "description": "This pizza does not exist"
+}
+
+### ============================================
+### DELETE PIZZA (DELETE)
+### ============================================
+
+### Delete pizza with ID 1
+DELETE {{baseUrl}}/api/pizzas/1
+
+### Delete pizza with ID 2
+DELETE {{baseUrl}}/api/pizzas/2
+
+### Delete pizza with ID 3
+DELETE {{baseUrl}}/api/pizzas/3
+
+### Delete pizza with ID 4
+DELETE {{baseUrl}}/api/pizzas/4
+
+### Delete non-existent pizza (should return 404)
+DELETE {{baseUrl}}/api/pizzas/999
+
+### ============================================
+### COMPLETE CRUD TEST FLOW
+### ============================================
+
+### Step 1: Create a new pizza
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Pizza",
+  "price": 13.50,
+  "description": "Testing pizza for CRUD flow"
+}
+
+### Step 2: Get all pizzas to verify creation
+GET {{baseUrl}}/api/pizzas
+
+### Step 3: Get the created pizza by ID
+GET {{baseUrl}}/api/pizzas/1
+
+### Step 4: Update the pizza
+PUT {{baseUrl}}/api/pizzas/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Updated Test Pizza",
+  "price": 14.50,
+  "description": "Testing pizza after update"
+}
+
+### Step 5: Verify the update
+GET {{baseUrl}}/api/pizzas/1
+
+### Step 6: Delete the pizza
+DELETE {{baseUrl}}/api/pizzas/1
+
+### Step 7: Verify deletion (should return 404)
+GET {{baseUrl}}/api/pizzas/1
+
+### ============================================
+### ERROR TESTING
+### ============================================
+
+### Test bad request - missing required field
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "Invalid Pizza",
+  "price": 12.99
+}
+
+### Test bad request - negative price
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "Negative Price Pizza",
+  "price": -5.00,
+  "description": "Pizza with invalid negative price"
+}
+
+### Test bad request - empty name
+POST {{baseUrl}}/api/pizzas
+Content-Type: {{contentType}}
+
+{
+  "name": "",
+  "price": 12.99,
+  "description": "Pizza with empty name"
+}
+
+### Test 404 - Get non-existent pizza
+GET {{baseUrl}}/api/pizzas/99999
+
+### Test 404 - Update non-existent pizza
+PUT {{baseUrl}}/api/pizzas/99999
+Content-Type: {{contentType}}
+
+{
+  "name": "Non-existent Pizza",
+  "price": 12.99,
+  "description": "Trying to update a pizza that does not exist"
+}
+
+### Test 404 - Delete non-existent pizza
+DELETE {{baseUrl}}/api/pizzas/99999
