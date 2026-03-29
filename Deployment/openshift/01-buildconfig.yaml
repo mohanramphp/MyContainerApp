@@ -17,7 +17,7 @@ spec:
   source:
     type: Git
     git:
-      uri: https://github.com/your-org/your-repo.git # Replace with your repository
+      uri: https://github.com/mohanramphp/MyContainerApp.git
       ref: main
 
   # Build strategy - Docker build
