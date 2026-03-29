@@ -17,10 +17,10 @@ spec:
   port:
     targetPort: http
 
-  # TLS configuration (optional - comment out if no TLS needed)
-  # tls:
-  #   termination: edge
-  #   insecureEdgeTerminationPolicy: Redirect
+  # TLS configuration - HTTPS support
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
 
   # Wildcard policy for subdomain handling
   wildcardPolicy: None
