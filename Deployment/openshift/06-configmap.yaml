@@ -8,12 +8,12 @@ metadata:
     version: v1
 data:
   # Logging configuration
-  log-level: "From ConfigMap: Information"
+  log-level: "Information"
 
   # API configuration
-  api-name: "From ConfigMap: Pizza API"
-  api-version: "From ConfigMap: 1.0.0"
-  api-environment: "From ConfigMap: Production"
+  api-name: "Pizza API"
+  api-version: "1.0.0"
+  api-environment: "Production"
 
   # You can add more environment-specific configurations here
   # These values can be referenced in DeploymentConfig as environment variables

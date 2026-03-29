@@ -1,6 +1,7 @@
 ### Pizza API REST Client Tests
 ### Base URL and Variables
-@baseUrl = http://localhost:5000
+#@baseUrl = http://localhost:5000
+@baseUrl = https://pizza-api-mohanramphp-dev.apps.rm3.7wse.p1.openshiftapps.com
 @contentType = application/json
 
 ### ============================================
